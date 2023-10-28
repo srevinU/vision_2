@@ -9,8 +9,8 @@ COPY nest-cli.json nest-cli.json
 
 RUN npm install
 
+COPY libs libs
 COPY apps/user user
-# COPY libs libs
 
 RUN cd user && npm install 
 
