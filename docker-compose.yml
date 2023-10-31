@@ -24,7 +24,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: ./apps/user/Dockerfile
+      dockerfile: ./apps/users/Dockerfile
       target: development
     command: npm run start:dev user
     ports:
