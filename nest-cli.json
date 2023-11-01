@@ -15,6 +15,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "users": {
+      "type": "application",
+      "root": "./apps/users",
+      "entryFile": "main",
+      "sourceRoot": "./apps/users/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/users/tsconfig.app.json"
+      }
+    },
+    "auths": {
+      "type": "application",
+      "root": "./apps/auths",
+      "entryFile": "main",
+      "sourceRoot": "./apps/auths/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auths/tsconfig.app.json"
+      }
     }
   }
 }

@@ -9,9 +9,9 @@ COPY package-lock.json ./
 
 RUN npm install
 
-COPY apps/auth apps/auth
+COPY apps/auths auths
 # COPY libs libs
 
-RUN cd apps/auth && npm install
+RUN cd auths && npm install
 
-RUN npm run build auth
+RUN npm run build .

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-export abstract class DatabaseService {
+export class DatabaseService {
   public prisma: PrismaClient = this.getPrismaClient();
 
   public getPrismaClient(): PrismaClient {

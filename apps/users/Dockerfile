@@ -14,4 +14,4 @@ COPY apps/users users
 
 RUN cd users && npm install
 
-RUN npm run build users
+RUN npm run build .
