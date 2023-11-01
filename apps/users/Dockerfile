@@ -12,6 +12,6 @@ RUN npm install
 COPY apps/users users
 # COPY libs libs
 
-RUN cd user && npm install 
+RUN cd users && npm install 
 
 RUN npm run build users

@@ -18,29 +18,29 @@ services:
     ports:
       - 8080:8080
 
-  user:
-    container_name: user-api
+  users:
+    container_name: users-api
     stdin_open: true
     restart: always
     build:
       context: .
-      dockerfile: ./apps/user/Dockerfile
+      dockerfile: ./apps/users/Dockerfile
       target: development
-    command: npm run start:dev user
+    command: npm run start:dev users
     ports:
       - 3000:3000
     depends_on:
       - db
 
-  auth:
-    container_name: auth-api
+  auths:
+    container_name: auths-api
     stdin_open: true
     restart: always
     build:
       context: .
-      dockerfile: ./apps/auth/Dockerfile
+      dockerfile: ./apps/auths/Dockerfile
       target: development
-    command: npm run start:dev auth
+    command: npm run start:dev auths
     ports:
       - 3001:3001
     depends_on:
