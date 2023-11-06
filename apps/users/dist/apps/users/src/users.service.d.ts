@@ -31,7 +31,7 @@ export declare class UsersService {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    update(id: string, updateUserDto: UpdateUserDto): Promise<{
+    update(updateUserDto: UpdateUserDto): Promise<{
         id: string;
         firstName: string;
         lastName: string;

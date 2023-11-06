@@ -33,11 +33,10 @@ let UsersService = class UsersService {
             },
         });
     }
-    async update(id, updateUserDto) {
-        console.log(updateUserDto);
+    async update(updateUserDto) {
         return await this.Prisma.user.upsert({
             where: {
-                id: id,
+                id: updateUserDto.id,
             },
             update: updateUserDto,
             create: updateUserDto,

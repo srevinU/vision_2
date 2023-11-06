@@ -6,6 +6,7 @@ import { PrismaService } from '@app/common/prisma/prisma.service';
 @Injectable()
 export class UsersService {
   constructor(private readonly Prisma: PrismaService) {}
+
   async create(createUserDto: CreateUserDto) {
     return await this.Prisma.user.create({
       data: createUserDto,
@@ -26,11 +27,10 @@ export class UsersService {
     });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
+  async update(updateUserDto: UpdateUserDto) {
     return await this.Prisma.user.upsert({
       where: {
-        id: id,
+        id: updateUserDto.id,
       },
       update: updateUserDto,
       create: updateUserDto,
