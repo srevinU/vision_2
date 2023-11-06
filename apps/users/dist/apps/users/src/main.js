@@ -4,7 +4,8 @@ const core_1 = require("@nestjs/core");
 const users_module_1 = require("./users.module");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(users_module_1.UsersModule);
-    await app.listen(3000);
+    await app.listen(3003);
+    console.log('App listening on port 3003');
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
