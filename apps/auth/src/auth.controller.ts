@@ -1,14 +1,14 @@
 import {
+  Res,
   Post,
   Body,
   Controller,
   HttpCode,
   HttpStatus,
-  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +23,6 @@ export class AuthController {
         httpOnly: true,
         expires: this.authService.getExpire(),
       })
-      .send({ status: 'ok' });
+      .send({ status: 'OK' });
   }
 }

@@ -1,19 +1,21 @@
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from '../../users/src/users.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { PrismaService } from '@app/common/prisma/prisma.service';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
     private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   async login(user: CreateAuthDto): Promise<any> {
-    const currentUser = await this.usersService.findOne(user.email);
+    const currentUser = await this.prismaService.user.findUnique({
+      where: { email: user.email },
+    });
 
     if (currentUser?.password !== user.password) {
       throw new UnauthorizedException();
@@ -35,9 +37,9 @@ export class AuthService {
 
   getExpire(): Date {
     const expires = new Date();
-    const date = expires.setSeconds(
+    const expiresDate = expires.setSeconds(
       expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
     );
-    return new Date(date);
+    return new Date(expiresDate);
   }
 }

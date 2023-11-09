@@ -19,10 +19,10 @@ export class UsersService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(email: string) {
     return await this.Prisma.user.findUnique({
       where: {
-        id: id,
+        email: email,
       },
     });
   }
