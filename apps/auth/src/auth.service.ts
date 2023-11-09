@@ -1,6 +1,8 @@
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { UserAuthDto } from './dto/user-auth.dto';
+import { CreateUserRegister } from './dto/create-user-register';
 import { PrismaService } from '@app/common/prisma/prisma.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
@@ -12,7 +14,16 @@ export class AuthService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async login(user: CreateAuthDto): Promise<any> {
+  private async generateHash(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10);
+  }
+
+  public async register(user: CreateUserRegister): Promise<CreateUserRegister> {
+    user.password = await this.generateHash(user.password);
+    return await this.prismaService.user.create({ data: user });
+  }
+
+  public async login(user: UserAuthDto): Promise<any> {
     const currentUser = await this.prismaService.user.findUnique({
       where: { email: user.email },
     });
@@ -35,7 +46,7 @@ export class AuthService {
     return { access_token: accessToken };
   }
 
-  getExpire(): Date {
+  public getExpire(): Date {
     const expires = new Date();
     const expiresDate = expires.setSeconds(
       expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
