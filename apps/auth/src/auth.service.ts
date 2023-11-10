@@ -15,10 +15,24 @@ export class AuthService {
   ) {}
 
   private async generateHash(password: string): Promise<string> {
-    return await bcrypt.hash(password, 10);
+    return await bcrypt.hash(
+      password,
+      parseInt(this.configService.get('SALT')),
+    );
+  }
+
+  private async isUserExisting(
+    user: CreateUserRegister,
+  ): Promise<CreateUserRegister | null> {
+    return await this.prismaService.user.findUnique({
+      where: { email: user.email },
+    });
   }
 
   public async register(user: CreateUserRegister): Promise<CreateUserRegister> {
+    if ((await this.isUserExisting(user)) != null) {
+      throw new UnauthorizedException();
+    }
     user.password = await this.generateHash(user.password);
     return await this.prismaService.user.create({ data: user });
   }
@@ -28,7 +42,16 @@ export class AuthService {
       where: { email: user.email },
     });
 
-    if (currentUser?.password !== user.password) {
+    if (!currentUser) {
+      throw new UnauthorizedException();
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      user.password,
+      currentUser?.password,
+    );
+
+    if (!isPasswordValid) {
       throw new UnauthorizedException();
     }
 

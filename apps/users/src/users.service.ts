@@ -16,6 +16,11 @@ export class UsersService {
   async findAll() {
     return await this.Prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
+      select: {
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
     });
   }
 
@@ -23,6 +28,11 @@ export class UsersService {
     return await this.Prisma.user.findUnique({
       where: {
         email: email,
+      },
+      select: {
+        firstName: true,
+        lastName: true,
+        email: true,
       },
     });
   }
