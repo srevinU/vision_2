@@ -6,7 +6,7 @@ export class UsersService {
   constructor(private readonly Prisma: PrismaService) {}
 
   async findOneByEmail(email: string) {
-    return await this.Prisma.user.findUnique({
+    return await this.Prisma.users.findUnique({
       where: {
         email: email,
       },
@@ -19,7 +19,7 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    return await this.Prisma.user.delete({
+    return await this.Prisma.users.delete({
       where: {
         id: id,
       },

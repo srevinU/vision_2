@@ -49,3 +49,19 @@ services:
       - 3001:3001
     depends_on:
       - db
+
+  roles:
+    container_name: roles-api
+    stdin_open: true
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/roles/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/roles/.env
+    ports:
+      - 3002:3002
+    depends_on:
+      - db

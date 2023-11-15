@@ -24,7 +24,7 @@ export class AuthService {
   private async isUserExisting(
     user: CreateUserRegister,
   ): Promise<CreateUserRegister | null> {
-    return await this.prismaService.user.findUnique({
+    return await this.prismaService.users.findUnique({
       where: { email: user.email },
     });
   }
@@ -34,11 +34,11 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     user.password = await this.generateHash(user.password);
-    return await this.prismaService.user.create({ data: user });
+    return await this.prismaService.users.create({ data: user });
   }
 
   public async login(user: UserAuthDto): Promise<any> {
-    const currentUser = await this.prismaService.user.findUnique({
+    const currentUser = await this.prismaService.users.findUnique({
       where: { email: user.email },
     });
 
