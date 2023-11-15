@@ -4,4 +4,8 @@ export class CreateRoleDto {
   @IsString()
   @IsNotEmpty()
   userId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: 'admin';
 }
