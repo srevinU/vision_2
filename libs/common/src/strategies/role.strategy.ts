@@ -6,7 +6,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class RoleStrategy extends PassportStrategy(Strategy, 'role') {
   constructor(private readonly prismaService: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -18,6 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate({ sub }: Tuser) {
-    return this.prismaService.users.findUnique({ where: { id: sub } });
+    return this.prismaService.roles.findMany({
+      where: { userId: sub, name: 'admin' },
+    });
   }
 }
