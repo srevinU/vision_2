@@ -18,15 +18,17 @@ services:
     ports:
       - 8080:8080
 
-  user:
-    container_name: user-api
+  users:
+    container_name: users-api
     stdin_open: true
     restart: always
     build:
       context: .
-      dockerfile: ./apps/user/Dockerfile
+      dockerfile: ./apps/users/Dockerfile
       target: development
-    command: npm run start:dev user
+    command: npm run start:dev users
+    env_file:
+      - ./apps/users/.env
     ports:
       - 3000:3000
     depends_on:
@@ -41,7 +43,25 @@ services:
       dockerfile: ./apps/auth/Dockerfile
       target: development
     command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
     ports:
       - 3001:3001
+    depends_on:
+      - db
+
+  roles:
+    container_name: roles-api
+    stdin_open: true
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/roles/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/roles/.env
+    ports:
+      - 3002:3002
     depends_on:
       - db
