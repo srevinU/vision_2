@@ -45,23 +45,33 @@ services:
     command: npm run start:dev auth
     env_file:
       - ./apps/auth/.env
+    volumes:
+      - "libs:/usr/src/app/libs/common"
     ports:
       - 3001:3001
     depends_on:
       - db
 
   roles:
-    container_name: roles-api
-    stdin_open: true
     restart: always
     build:
-      context: .
-      dockerfile: ./apps/roles/Dockerfile
+      context: ./apps/roles
       target: development
-    command: npm run start:dev auth
+    command: npm run start:dev roles
     env_file:
       - ./apps/roles/.env
     ports:
       - 3002:3002
+    volumes:
+      - "./apps/roles:/usr/src/app:rw"
+      - "libs:/usr/src/app/libs/common"
     depends_on:
       - db
+
+volumes:
+  libs:
+    driver: local # Define the driver and options under the volume name
+    driver_opts:
+      type: none
+      device: ./libs/common
+      o: bind
