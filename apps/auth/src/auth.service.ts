@@ -1,24 +1,21 @@
+import { env } from 'process';
 import * as bcrypt from 'bcrypt';
+import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { UserAuthDto } from './dto/user-auth.dto';
-import { CreateUserRegister } from './dto/create-user-register';
 import { PrismaService } from '@app/common/prisma/prisma.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { CreateUserRegister } from './dto/create-user-register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
   ) {}
 
   private async generateHash(password: string): Promise<string> {
-    return await bcrypt.hash(
-      password,
-      parseInt(this.configService.get('SALT')),
-    );
+    return await bcrypt.hash(password, parseInt(env.SALT));
   }
 
   private async isUserExisting(
@@ -34,7 +31,14 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     user.password = await this.generateHash(user.password);
+    user.email = user.email.toLowerCase();
     return await this.prismaService.users.create({ data: user });
+  }
+
+  private async generateToken(payload: object, secret: string) {
+    return await this.jwtService.signAsync(payload, {
+      secret: secret,
+    });
   }
 
   public async login(user: UserAuthDto): Promise<any> {
@@ -62,18 +66,39 @@ export class AuthService {
       firstName: currentUser.firstName,
     };
 
-    const accessToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get('JWT_SECRET'),
-    });
+    const accessToken = await this.generateToken(payload, env.JWT_SECRET);
+    const refreshToken = await this.generateToken(
+      payload,
+      env.REFRESH_JWT_SECRET,
+    );
 
-    return { access_token: accessToken };
+    return { access_token: accessToken, refresh_token: refreshToken };
   }
 
-  public getExpire(): Date {
+  private getExpire(): Date {
     const expires = new Date();
     const expiresDate = expires.setSeconds(
-      expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
+      expires.getSeconds() + Number(env.JWT_EXPIRATION),
     );
     return new Date(expiresDate);
+  }
+
+  public async setResCookie(
+    response: Response,
+    key: string,
+    value: string,
+  ): Promise<Response> {
+    return response.cookie(key, value, {
+      httpOnly: true,
+      expires: this.getExpire(),
+    });
+  }
+
+  public refreshToken() {
+    return null;
+  }
+
+  public logOut() {
+    return null;
   }
 }
