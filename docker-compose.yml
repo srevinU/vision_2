@@ -20,7 +20,6 @@ services:
 
   users:
     container_name: users-api
-    stdin_open: true
     restart: always
     build:
       context: .
@@ -31,12 +30,14 @@ services:
       - ./apps/users/.env
     ports:
       - 3000:3000
+    volumes:
+      - './apps/users:/usr/src/app/apps/users:rw'
+      - './libs/common:/usr/src/app/libs/common:rw'
     depends_on:
       - db
 
   auth:
     container_name: auth-api
-    stdin_open: true
     restart: always
     build:
       context: .
@@ -47,21 +48,26 @@ services:
       - ./apps/auth/.env
     ports:
       - 3001:3001
+    volumes:
+      - './apps/auth:/usr/src/app/apps/auth:rw'
+      - './libs/common:/usr/src/app/libs/common:rw'
     depends_on:
       - db
 
   roles:
     container_name: roles-api
-    stdin_open: true
     restart: always
     build:
       context: .
       dockerfile: ./apps/roles/Dockerfile
       target: development
-    command: npm run start:dev auth
+    command: npm run start:dev roles
     env_file:
       - ./apps/roles/.env
     ports:
       - 3002:3002
+    volumes:
+      - ./apps/roles:/usr/src/app/apps/roles:rw
+      - ./libs/common:/usr/src/app/libs/common:rw
     depends_on:
       - db
