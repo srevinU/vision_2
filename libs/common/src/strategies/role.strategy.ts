@@ -18,7 +18,7 @@ export class RoleStrategy extends PassportStrategy(Strategy, 'role') {
   }
 
   async validate({ sub }: Tuser) {
-    return this.prismaService.roles.findMany({
+    return await this.prismaService.roles.findMany({
       where: { userId: sub, name: 'admin' },
     });
   }

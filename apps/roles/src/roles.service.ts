@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { PrismaService } from '@app/common/prisma/prisma.service';
-import { errorMessages } from './messages/errors';
+import { errorMessages } from '@app/common/messages/errors';
 import { ForbiddenException } from '@app/common/exeptions/index';
 
 @Injectable()

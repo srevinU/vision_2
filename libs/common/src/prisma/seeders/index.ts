@@ -4,8 +4,8 @@ import { userSeeds } from './users';
 const prisma = new PrismaClient();
 
 async function main() {
-  userSeeds(prisma);
-  roleSeeds(prisma);
+  await userSeeds(prisma);
+  await roleSeeds(prisma);
 }
 
 main()

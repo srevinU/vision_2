@@ -6,8 +6,10 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Param,
+  Req,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { UserAuthDto } from './dto/user-auth.dto';
 import { CreateUserRegister } from './dto/create-user-register.dto';
@@ -24,17 +26,13 @@ export class AuthController {
   ): Promise<Response | undefined | void> {
     const { access_token, refresh_token } =
       await this.authService.login(userAuthDto);
-    const responseWithJwt = await this.authService.setResCookie(
+    const res = await this.authService.setCookies(
       response,
-      'access_token',
       access_token,
-    );
-    const responseWithRefreshJwt = await this.authService.setResCookie(
-      responseWithJwt,
-      'refresh_token',
       refresh_token,
+      userAuthDto,
     );
-    responseWithRefreshJwt.send({ status: 'OK' });
+    res.send({ status: 'OK' });
   }
 
   @HttpCode(HttpStatus.OK)
@@ -45,13 +43,22 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Get('refresh')
-  async refreshToken() {
-    return await this.authService.refreshToken();
+  async refreshToken(@Req() request: Request, @Res() response: Response) {
+    const accessTokenRefreshed = await this.authService.refreshToken(request);
+    const res = await this.authService.setCookies(
+      response,
+      accessTokenRefreshed,
+    );
+    res.send({ status: 'OK' });
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get('logout')
-  async logOut() {
-    return await this.authService.logOut();
+  @Get('logout/:userId')
+  async logOut(
+    @Param('userId') userId: string,
+    @Res() response: Response,
+  ): Promise<Response | undefined | void> {
+    const responseAfterLogOut = this.authService.logOut(response, userId);
+    responseAfterLogOut.send({ status: 'OK' });
   }
 }

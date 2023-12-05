@@ -1,6 +1,6 @@
 import { env } from 'process';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { UserAuthDto } from './dto/user-auth.dto';
 import { PrismaService } from '@app/common/prisma/prisma.service';
@@ -35,7 +35,10 @@ export class AuthService {
     return await this.prismaService.users.create({ data: user });
   }
 
-  private async generateToken(payload: object, secret: string) {
+  private async generateToken(
+    payload: object,
+    secret: string,
+  ): Promise<string> {
     return await this.jwtService.signAsync(payload, {
       secret: secret,
     });
@@ -71,34 +74,122 @@ export class AuthService {
       payload,
       env.REFRESH_JWT_SECRET,
     );
-
     return { access_token: accessToken, refresh_token: refreshToken };
   }
 
-  private getExpire(): Date {
+  private getExpirationDate(expirationTime: string): Date {
     const expires = new Date();
     const expiresDate = expires.setSeconds(
-      expires.getSeconds() + Number(env.JWT_EXPIRATION),
+      expires.getSeconds() + Number(expirationTime),
     );
     return new Date(expiresDate);
   }
 
-  public async setResCookie(
-    response: Response,
-    key: string,
-    value: string,
-  ): Promise<Response> {
-    return response.cookie(key, value, {
-      httpOnly: true,
-      expires: this.getExpire(),
+  private async saveRefreshToken(
+    userAuth: UserAuthDto,
+    refreshToken: string,
+    expirationDate: Date,
+  ): Promise<void> {
+    const user = await this.prismaService.users.findUnique({
+      where: { email: userAuth.email },
     });
+    const token = await this.prismaService.tokens.findMany({
+      where: { userId: user.id },
+    });
+    if (!token.length) {
+      await this.prismaService.tokens.create({
+        data: {
+          userId: user.id,
+          refreshToken: refreshToken,
+          expiresAt: expirationDate,
+        },
+      });
+    }
   }
 
-  public refreshToken() {
-    return null;
+  public async setCookies(
+    response: Response,
+    access_token: string,
+    refresh_token?: string,
+    userAuthDto?: UserAuthDto,
+  ): Promise<Response> {
+    const expirationJwtDate = this.getExpirationDate(env.JWT_EXPIRATION);
+    const expirationJwtRefreshDate = this.getExpirationDate(
+      env.JWT_REFRESH_EXPIRATION,
+    );
+
+    if (access_token) {
+      response.cookie('access_token', access_token, {
+        httpOnly: true,
+        expires: expirationJwtDate,
+      });
+    }
+
+    if (refresh_token) {
+      response.cookie('refresh_token', refresh_token, {
+        httpOnly: true,
+      });
+      await this.saveRefreshToken(
+        userAuthDto,
+        refresh_token,
+        expirationJwtRefreshDate,
+      );
+    }
+    return response;
   }
 
-  public logOut() {
-    return null;
+  private async clearRefreshToken(userId: string): Promise<void> {
+    await this.prismaService.tokens.delete({ where: { userId: userId } });
+  }
+
+  private clearCookies(response: Response): void {
+    response.cookie('access_token', '', { maxAge: -1 });
+    response.cookie('refresh_token', '', { maxAge: -1 });
+  }
+
+  public logOut(response: Response, userId: string): Response {
+    this.clearRefreshToken(userId);
+    this.clearCookies(response);
+    return response;
+  }
+
+  private extractTokenFromCookies(request: Request, tokenName: string): string {
+    return request.cookies[tokenName];
+  }
+
+  private verifyToken(
+    request: Request,
+    tokenName: string,
+    tokenSecret: string,
+  ): void {
+    const token = this.extractAccessTokenFromCookies(request, tokenName);
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    try {
+      this.jwtService.verify(token, { secret: tokenSecret });
+    } catch {
+      throw new UnauthorizedException();
+    }
+  }
+
+  private getPayload(token: string, tokenSecret: string): object {
+    return this.jwtService.verify(token, { secret: tokenSecret });
+  }
+
+  public async refreshToken(request: Request): Promise<string> {
+    this.verifyToken(request, 'refresh_token', env.REFRESH_JWT_SECRET);
+    this.verifyToken(request, 'access_token', env.JWT_SECRET);
+    const token = this.extractTokenFromCookies(request, 'access_token');
+    const payload = this.getPayload(token, env.JWT_SECRET);
+    const user = await this.isUserExisting(payload as CreateUserRegister);
+    if (user) {
+      const accessTokenRefreshed = await this.generateToken(
+        payload,
+        env.JWT_SECRET,
+      );
+      return accessTokenRefreshed;
+    }
+    throw new UnauthorizedException();
   }
 }
