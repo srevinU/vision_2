@@ -162,7 +162,7 @@ export class AuthService {
     tokenName: string,
     tokenSecret: string,
   ): void {
-    const token = this.extractAccessTokenFromCookies(request, tokenName);
+    const token = this.extractTokenFromCookies(request, tokenName);
     if (!token) {
       throw new UnauthorizedException();
     }
