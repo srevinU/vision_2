@@ -177,18 +177,33 @@ export class AuthService {
     return this.jwtService.verify(token, { secret: tokenSecret });
   }
 
-  public async refreshToken(request: Request): Promise<string> {
+  public async refreshToken(request: Request): Promise<any> {
     this.verifyToken(request, 'refresh_token', env.REFRESH_JWT_SECRET);
     this.verifyToken(request, 'access_token', env.JWT_SECRET);
-    const token = this.extractTokenFromCookies(request, 'access_token');
-    const payload = this.getPayload(token, env.JWT_SECRET);
+    const accessToken = this.extractTokenFromCookies(request, 'access_token');
+    const payload = this.getPayload(accessToken, env.JWT_SECRET);
     const user = await this.isUserExisting(payload as CreateUserRegister);
     if (user) {
       const accessTokenRefreshed = await this.generateToken(
         payload,
         env.JWT_SECRET,
       );
-      return accessTokenRefreshed;
+      const refreshTokenRefreshed = await this.generateToken(
+        payload,
+        env.REFRESH_JWT_SECRET,
+      );
+
+      await this.clearRefreshToken(payload['sub']);
+      await this.saveRefreshToken(
+        user as UserAuthDto,
+        refreshTokenRefreshed,
+        this.getExpirationDate(env.JWT_REFRESH_EXPIRATION),
+      );
+      return {
+        access_token: accessTokenRefreshed,
+        refresh_token: refreshTokenRefreshed,
+        user: user,
+      };
     }
     throw new UnauthorizedException();
   }

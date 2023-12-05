@@ -44,10 +44,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Get('refresh')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
-    const accessTokenRefreshed = await this.authService.refreshToken(request);
+    const { access_token, refresh_token, user } =
+      await this.authService.refreshToken(request);
     const res = await this.authService.setCookies(
       response,
-      accessTokenRefreshed,
+      access_token,
+      refresh_token,
+      user,
     );
     res.send({ status: 'OK' });
   }
