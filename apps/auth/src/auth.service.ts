@@ -157,17 +157,23 @@ export class AuthService {
     return request.cookies[tokenName];
   }
 
-  private verifyToken(
+  private async verifyToken(
     request: Request,
     tokenName: string,
     tokenSecret: string,
-  ): void {
+  ): Promise<void> {
     const token = this.extractTokenFromCookies(request, tokenName);
     if (!token) {
       throw new UnauthorizedException();
     }
     try {
       this.jwtService.verify(token, { secret: tokenSecret });
+      if (tokenName === 'refresh_token') {
+        const refreshToken = await this.prismaService.tokens.findUnique({
+          where: { refreshToken: token },
+        });
+        if (!refreshToken) throw new UnauthorizedException();
+      }
     } catch {
       throw new UnauthorizedException();
     }
@@ -178,8 +184,8 @@ export class AuthService {
   }
 
   public async refreshToken(request: Request): Promise<any> {
-    this.verifyToken(request, 'refresh_token', env.REFRESH_JWT_SECRET);
-    this.verifyToken(request, 'access_token', env.JWT_SECRET);
+    await this.verifyToken(request, 'refresh_token', env.REFRESH_JWT_SECRET);
+    await this.verifyToken(request, 'access_token', env.JWT_SECRET);
     const accessToken = this.extractTokenFromCookies(request, 'access_token');
     const payload = this.getPayload(accessToken, env.JWT_SECRET);
     const user = await this.isUserExisting(payload as CreateUserRegister);
