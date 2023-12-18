@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { UserAuthDto } from './dto/user-auth.dto';
 import { PrismaService } from '@app/common/prisma/prisma.service';
+import { RedisService } from '@app/common/redis/redis.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserRegister } from './dto/create-user-register.dto';
 
@@ -12,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
+    private readonly redisService: RedisService,
   ) {}
 
   private async generateHash(password: string): Promise<string> {
@@ -74,7 +76,12 @@ export class AuthService {
       payload,
       env.REFRESH_JWT_SECRET,
     );
-    return { access_token: accessToken, refresh_token: refreshToken };
+
+    const tokens = { access_token: accessToken, refresh_token: refreshToken };
+
+    this.redisService.add(currentUser.email, tokens);
+
+    return tokens;
   }
 
   private getExpirationDate(expirationTime: string): Date {
@@ -85,61 +92,27 @@ export class AuthService {
     return new Date(expiresDate);
   }
 
-  private async saveRefreshToken(
-    userAuth: UserAuthDto,
-    refreshToken: string,
-    expirationDate: Date,
-  ): Promise<void> {
-    const user = await this.prismaService.users.findUnique({
-      where: { email: userAuth.email },
-    });
-    const token = await this.prismaService.tokens.findMany({
-      where: { userId: user.id },
-    });
-    if (!token.length) {
-      await this.prismaService.tokens.create({
-        data: {
-          userId: user.id,
-          refreshToken: refreshToken,
-          expiresAt: expirationDate,
-        },
-      });
-    }
-  }
-
   public async setCookies(
     response: Response,
-    access_token: string,
-    refresh_token?: string,
-    userAuthDto?: UserAuthDto,
+    accessToken: string,
+    refreshToken?: string,
   ): Promise<Response> {
     const expirationJwtDate = this.getExpirationDate(env.JWT_EXPIRATION);
     const expirationJwtRefreshDate = this.getExpirationDate(
       env.JWT_REFRESH_EXPIRATION,
     );
 
-    if (access_token) {
-      response.cookie('access_token', access_token, {
-        httpOnly: true,
-        expires: expirationJwtDate,
-      });
-    }
+    response.cookie('access_token', accessToken, {
+      httpOnly: true,
+      expires: expirationJwtDate,
+    });
 
-    if (refresh_token) {
-      response.cookie('refresh_token', refresh_token, {
-        httpOnly: true,
-      });
-      await this.saveRefreshToken(
-        userAuthDto,
-        refresh_token,
-        expirationJwtRefreshDate,
-      );
-    }
+    response.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      expires: expirationJwtRefreshDate,
+    });
+
     return response;
-  }
-
-  private async clearRefreshToken(userId: string): Promise<void> {
-    await this.prismaService.tokens.delete({ where: { userId: userId } });
   }
 
   private clearCookies(response: Response): void {
@@ -147,9 +120,9 @@ export class AuthService {
     response.cookie('refresh_token', '', { maxAge: -1 });
   }
 
-  public logOut(response: Response, userId: string): Response {
-    this.clearRefreshToken(userId);
+  public logOut(response: Response, userEmail: string): Response {
     this.clearCookies(response);
+    this.redisService.delete(userEmail);
     return response;
   }
 
@@ -161,17 +134,19 @@ export class AuthService {
     request: Request,
     tokenName: string,
     tokenSecret: string,
+    email: string,
   ): Promise<void> {
     const token = this.extractTokenFromCookies(request, tokenName);
+
     if (!token) {
       throw new UnauthorizedException();
     }
+
     try {
       this.jwtService.verify(token, { secret: tokenSecret });
       if (tokenName === 'refresh_token') {
-        const refreshToken = await this.prismaService.tokens.findUnique({
-          where: { refreshToken: token },
-        });
+        const tokens = await this.redisService.get(email);
+        const refreshToken = tokens['refresh_token'];
         if (!refreshToken) throw new UnauthorizedException();
       }
     } catch {
@@ -183,33 +158,45 @@ export class AuthService {
     return this.jwtService.verify(token, { secret: tokenSecret });
   }
 
-  public async refreshToken(request: Request): Promise<any> {
-    await this.verifyToken(request, 'refresh_token', env.REFRESH_JWT_SECRET);
-    await this.verifyToken(request, 'access_token', env.JWT_SECRET);
+  public async refreshTokens(request: Request): Promise<any> {
     const accessToken = this.extractTokenFromCookies(request, 'access_token');
     const payload = this.getPayload(accessToken, env.JWT_SECRET);
     const user = await this.isUserExisting(payload as CreateUserRegister);
+
     if (user) {
+      await this.verifyToken(
+        request,
+        'refresh_token',
+        env.REFRESH_JWT_SECRET,
+        user.email,
+      );
+
+      await this.verifyToken(
+        request,
+        'access_token',
+        env.JWT_SECRET,
+        user.email,
+      );
+
       const accessTokenRefreshed = await this.generateToken(
         payload,
         env.JWT_SECRET,
       );
+
       const refreshTokenRefreshed = await this.generateToken(
         payload,
         env.REFRESH_JWT_SECRET,
       );
 
-      await this.clearRefreshToken(payload['sub']);
-      await this.saveRefreshToken(
-        user as UserAuthDto,
-        refreshTokenRefreshed,
-        this.getExpirationDate(env.JWT_REFRESH_EXPIRATION),
-      );
-      return {
+      const tokensRefreshed = {
         access_token: accessTokenRefreshed,
         refresh_token: refreshTokenRefreshed,
-        user: user,
       };
+
+      this.redisService.delete(user.email);
+      this.redisService.add(user.email, tokensRefreshed);
+
+      return tokensRefreshed;
     }
     throw new UnauthorizedException();
   }
