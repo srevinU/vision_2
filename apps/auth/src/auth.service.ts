@@ -41,12 +41,15 @@ export class AuthService {
     payload: object,
     secret: string,
   ): Promise<string> {
-    return await this.jwtService.signAsync(payload, {
-      secret: secret,
-    });
+    payload['date'] = new Date();
+    return await this.jwtService.signAsync(payload, { secret: secret });
   }
 
   public async login(user: UserAuthDto): Promise<any> {
+    if (!user.email || !user.password) {
+      throw new UnauthorizedException();
+    }
+
     const currentUser = await this.prismaService.users.findUnique({
       where: { email: user.email },
     });
@@ -57,7 +60,7 @@ export class AuthService {
 
     const isPasswordValid = await bcrypt.compare(
       user.password,
-      currentUser?.password,
+      currentUser.password,
     );
 
     if (!isPasswordValid) {

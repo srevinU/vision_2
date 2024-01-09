@@ -6,25 +6,25 @@ import { Cache } from 'cache-manager';
 export class RedisService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
-  public async add(key: string, values: object): Promise<void> {
+  public async add(emailKey: string, values: object): Promise<void> {
     try {
-      await this.cacheManager.set(key, values, 2000);
+      await this.cacheManager.set(emailKey, values, 2000);
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async delete(key: string): Promise<void> {
+  public async delete(emailKey: string): Promise<void> {
     try {
-      await this.cacheManager.del(key);
+      await this.cacheManager.del(emailKey);
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async get(key: string): Promise<string> {
+  public async get(emailKey: string): Promise<string> {
     try {
-      return await this.cacheManager.get(key);
+      return await this.cacheManager.get(emailKey);
     } catch (error) {
       console.error(error);
     }
