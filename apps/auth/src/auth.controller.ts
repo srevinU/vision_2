@@ -24,14 +24,8 @@ export class AuthController {
     @Body() userAuthDto: UserAuthDto,
     @Res() response: Response,
   ): Promise<Response | undefined | void> {
-    const { access_token, refresh_token } =
-      await this.authService.login(userAuthDto);
-    const res = await this.authService.setCookies(
-      response,
-      access_token,
-      refresh_token,
-    );
-    res.send({ status: 'OK' });
+    await this.authService.login(userAuthDto, response);
+    response.send({ status: 'OK' });
   }
 
   @HttpCode(HttpStatus.OK)
@@ -43,14 +37,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Get('refresh')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
-    const { access_token, refresh_token } =
-      await this.authService.refreshTokens(request);
-    const res = await this.authService.setCookies(
-      response,
-      access_token,
-      refresh_token,
-    );
-    res.send({ status: 'OK' });
+    await this.authService.refreshTokens(request, response);
+    response.send({ status: 'OK' });
   }
 
   @HttpCode(HttpStatus.OK)
@@ -59,7 +47,7 @@ export class AuthController {
     @Param('userEmail') userEmail: string,
     @Res() response: Response,
   ): Promise<Response | undefined | void> {
-    const responseAfterLogOut = this.authService.logOut(response, userEmail);
-    responseAfterLogOut.send({ status: 'OK' });
+    this.authService.logOut(response, userEmail);
+    response.send({ status: 'OK' });
   }
 }

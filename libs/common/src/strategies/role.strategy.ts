@@ -10,7 +10,7 @@ export class RoleStrategy extends PassportStrategy(Strategy, 'role') {
   constructor(private readonly prismaService: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => request?.cookies['access_token'],
+        (request: any) => request?.cookies['Authentication'],
       ]),
       ignoreExpiration: false,
       secretOrKey: env.JWT_SECRET,
