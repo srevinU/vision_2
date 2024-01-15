@@ -1,5 +1,6 @@
 describe('Auth endpoint', () => {
-  let tokens;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let jwt;
   it('Register a new user', async () => {
     const user = {
       firstName: 'e2eTest',
@@ -30,14 +31,20 @@ describe('Auth endpoint', () => {
       body: JSON.stringify(user),
     });
     expect(response.ok).toBeTruthy();
-    tokens = response.headers.get('Set-Cookie');
+    const toCheck = await response.text();
+    console.log('toCheck', toCheck);
+    jwt = response.headers.get('Set-Cookie');
+    console.log('jwt', jwt);
   });
 
   it('Refresh the user tokens', async () => {
     const request = new Request('http://localhost:3001/api/auth/refresh', {
-      method: 'GET',
+      headers: {
+        Cookie: jwt,
+      },
     });
     const response = await fetch(request);
+    console.log('response.status', response.status);
     expect(response.ok).toBeTruthy();
   });
 
