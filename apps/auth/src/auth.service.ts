@@ -29,9 +29,8 @@ export class AuthService {
   }
 
   public async register(user: CreateUserRegister): Promise<CreateUserRegister> {
-    if ((await this.isUserExisting(user)) != null) {
-      throw new UnauthorizedException();
-    }
+    const userExisting = await this.isUserExisting(user);
+    if (userExisting) throw new UnauthorizedException();
     user.password = await this.generateHash(user.password);
     user.email = user.email.toLowerCase();
     return await this.prismaService.users.create({ data: user });
@@ -45,7 +44,7 @@ export class AuthService {
     return await this.jwtService.signAsync(payload, { secret: secret });
   }
 
-  public async login(user: UserAuthDto): Promise<any> {
+  public async login(user: UserAuthDto, response: Response): Promise<void> {
     if (!user.email || !user.password) {
       throw new UnauthorizedException();
     }
@@ -74,17 +73,10 @@ export class AuthService {
       firstName: currentUser.firstName,
     };
 
-    const accessToken = await this.generateToken(payload, env.JWT_SECRET);
-    const refreshToken = await this.generateToken(
-      payload,
-      env.REFRESH_JWT_SECRET,
-    );
+    const jwt = await this.generateToken(payload, env.JWT_SECRET);
+    this.redisService.add(currentUser.email, jwt);
 
-    const tokens = { access_token: accessToken, refresh_token: refreshToken };
-
-    this.redisService.add(currentUser.email, tokens);
-
-    return tokens;
+    this.setCookie(response, jwt);
   }
 
   private getExpirationDate(expirationTime: string): Date {
@@ -95,38 +87,27 @@ export class AuthService {
     return new Date(expiresDate);
   }
 
-  public async setCookies(
+  public async setCookie(
     response: Response,
     accessToken: string,
-    refreshToken?: string,
   ): Promise<Response> {
     const expirationJwtDate = this.getExpirationDate(env.JWT_EXPIRATION);
-    const expirationJwtRefreshDate = this.getExpirationDate(
-      env.JWT_REFRESH_EXPIRATION,
-    );
 
-    response.cookie('access_token', accessToken, {
+    response.cookie('Authentication', accessToken, {
       httpOnly: true,
       expires: expirationJwtDate,
-    });
-
-    response.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      expires: expirationJwtRefreshDate,
     });
 
     return response;
   }
 
   private clearCookies(response: Response): void {
-    response.cookie('access_token', '', { maxAge: -1 });
-    response.cookie('refresh_token', '', { maxAge: -1 });
+    response.cookie('Authentication', '', { maxAge: -1 });
   }
 
-  public logOut(response: Response, userEmail: string): Response {
+  public logOut(response: Response, userEmail: string): void {
     this.clearCookies(response);
     this.redisService.delete(userEmail);
-    return response;
   }
 
   private extractTokenFromCookies(request: Request, tokenName: string): string {
@@ -137,21 +118,12 @@ export class AuthService {
     request: Request,
     tokenName: string,
     tokenSecret: string,
-    email: string,
   ): Promise<void> {
     const token = this.extractTokenFromCookies(request, tokenName);
-
-    if (!token) {
-      throw new UnauthorizedException();
-    }
+    if (!token) throw new UnauthorizedException();
 
     try {
       this.jwtService.verify(token, { secret: tokenSecret });
-      if (tokenName === 'refresh_token') {
-        const tokens = await this.redisService.get(email);
-        const refreshToken = tokens['refresh_token'];
-        if (!refreshToken) throw new UnauthorizedException();
-      }
     } catch {
       throw new UnauthorizedException();
     }
@@ -161,46 +133,18 @@ export class AuthService {
     return this.jwtService.verify(token, { secret: tokenSecret });
   }
 
-  public async refreshTokens(request: Request): Promise<any> {
-    const accessToken = this.extractTokenFromCookies(request, 'access_token');
-    const payload = this.getPayload(accessToken, env.JWT_SECRET);
+  public async refreshTokens(
+    request: Request,
+    response: Response,
+  ): Promise<void> {
+    let jwt = this.extractTokenFromCookies(request, 'Authentication');
+    if (!jwt) throw new UnauthorizedException();
+    const payload = this.getPayload(jwt, env.JWT_SECRET);
     const user = await this.isUserExisting(payload as CreateUserRegister);
-
-    if (user) {
-      await this.verifyToken(
-        request,
-        'refresh_token',
-        env.REFRESH_JWT_SECRET,
-        user.email,
-      );
-
-      await this.verifyToken(
-        request,
-        'access_token',
-        env.JWT_SECRET,
-        user.email,
-      );
-
-      const accessTokenRefreshed = await this.generateToken(
-        payload,
-        env.JWT_SECRET,
-      );
-
-      const refreshTokenRefreshed = await this.generateToken(
-        payload,
-        env.REFRESH_JWT_SECRET,
-      );
-
-      const tokensRefreshed = {
-        access_token: accessTokenRefreshed,
-        refresh_token: refreshTokenRefreshed,
-      };
-
-      this.redisService.delete(user.email);
-      this.redisService.add(user.email, tokensRefreshed);
-
-      return tokensRefreshed;
-    }
-    throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException();
+    await this.verifyToken(request, 'Authentication', env.JWT_SECRET);
+    jwt = await this.generateToken(payload, env.JWT_SECRET);
+    this.redisService.delete(user.email);
+    this.setCookie(response, jwt);
   }
 }

@@ -25,6 +25,7 @@ export class RolesController {
 
   @Get()
   findAll() {
+    console.log('In find all');
     return this.rolesService.findAll();
   }
 
