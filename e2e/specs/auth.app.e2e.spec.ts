@@ -8,7 +8,7 @@ describe('Auth endpoint', () => {
       email: 'e2eTest@gmail.com',
       password: 'e2eTest',
     };
-    const response = await fetch('http://localhost:3001/api/auth/register', {
+    const response = await fetch('http://auth-api:3001/api/auth/register', {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -23,7 +23,7 @@ describe('Auth endpoint', () => {
       email: 'e2eTest@gmail.com',
       password: 'e2eTest',
     };
-    const response = await fetch('http://localhost:3001/api/auth/login', {
+    const response = await fetch('http://auth-api:3001/api/auth/login', {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -31,26 +31,22 @@ describe('Auth endpoint', () => {
       body: JSON.stringify(user),
     });
     expect(response.ok).toBeTruthy();
-    const toCheck = await response.text();
-    console.log('toCheck', toCheck);
     jwt = response.headers.get('Set-Cookie');
-    console.log('jwt', jwt);
   });
 
   it('Refresh the user tokens', async () => {
-    const request = new Request('http://localhost:3001/api/auth/refresh', {
+    const request = new Request('http://auth-api:3001/api/auth/refresh', {
       headers: {
         Cookie: jwt,
       },
     });
     const response = await fetch(request);
-    console.log('response.status', response.status);
     expect(response.ok).toBeTruthy();
   });
 
   it('Logout the user', async () => {
     const response = await fetch(
-      'http://localhost:3001/api/auth/logout/e2eTest@gmail.com',
+      'http://auth-api:3001/api/auth/logout/e2eTest@gmail.com',
     );
     expect(response.ok).toBeTruthy();
   });
