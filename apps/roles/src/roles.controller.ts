@@ -25,13 +25,12 @@ export class RolesController {
 
   @Get()
   findAll() {
-    console.log('In find all');
     return this.rolesService.findAll();
   }
 
-  @Get(':roleId')
-  findOne(@Param('roleId') roleId: string) {
-    return this.rolesService.findOne(roleId);
+  @Get(':userId')
+  findOne(@Param('userId') userId: string) {
+    return this.rolesService.findMany(userId);
   }
 
   @Delete(':roleId')

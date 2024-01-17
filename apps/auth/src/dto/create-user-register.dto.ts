@@ -8,11 +8,11 @@ import {
 export class CreateUserRegister {
   @IsString()
   @IsNotEmpty()
-  firstName;
+  firstName: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName;
+  lastName: string;
 
   @IsEmail()
   @IsNotEmpty()
