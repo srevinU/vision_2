@@ -1,20 +1,22 @@
 version: '3.1'
 
 services:
-  # e2e:
-  # container_name: e2e-tests
-  # build:
-  #   dockerfile: ./e2e/Dockerfile
-  # volumes:
-  #   - './e2e/specs:/usr/src/app/e2e/specs:rw'
-  # depends_on:
-  #   - db
-  #   - redis
-  #   - users
-  #   - auth
-  #   - roles
-  # networks:
-  #   - e2e_net
+  e2e:
+    container_name: e2e-tests
+    build:
+      dockerfile: ./e2e/Dockerfile
+    volumes:
+      - './e2e/specs:/usr/src/app/e2e/specs:rw'
+    env_file:
+      - ./e2e/.env.dev
+    depends_on:
+      - db
+      - redis
+      - users
+      - auth
+      - roles
+    networks:
+      - e2e_net
 
   db:
     container_name: database
