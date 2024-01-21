@@ -1,14 +1,15 @@
 describe('Auth endpoint', () => {
   const env = process.env;
   let jwt;
+  let userId;
   it('Register a new user', async () => {
     const user = {
-      firstName: 'e2e_Test',
-      lastName: 'e2e_Test',
-      email: 'e2e_Test@gmail.com',
-      password: 'e2e_Test',
+      firstName: 'e2e_auth_Test',
+      lastName: 'e2e_auth_Test',
+      email: 'e2e_auth_Test@gmail.com',
+      password: 'e2e_auth_Test',
     };
-    await fetch(
+    const response = await fetch(
       `http://${env.AUTH_DOMAIN}:${env.AUTH_PORT}/api/auth/register`,
       {
         headers: {
@@ -17,12 +18,13 @@ describe('Auth endpoint', () => {
         method: 'POST',
         body: JSON.stringify(user),
       },
-    ).then((response) => {
-      expect(response.ok).toBeTruthy();
-    });
+    );
+    expect(response.ok).toBeTruthy();
+    const data = await response.text();
+    userId = JSON.parse(data).id;
   });
 
-  it('Login test user', async () => {
+  it('Login admin user', async () => {
     const user = {
       email: 'admin@gmail.fr',
       password: 'u_user_test_password_1',
@@ -52,6 +54,20 @@ describe('Auth endpoint', () => {
       },
     );
     const response = await fetch(request);
+    expect(response.ok).toBeTruthy();
+  });
+
+  it('Delete user registered', async () => {
+    const response = await fetch(
+      `http://${env.USER_DOMAIN}:${env.USER_PORT}/api/users/${userId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: jwt,
+        },
+        method: 'DELETE',
+      },
+    );
     expect(response.ok).toBeTruthy();
   });
 
