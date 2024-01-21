@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+
 cd ./e2e and npm run test
 # make start-test
 # docker exec great-app npx lint-staged
