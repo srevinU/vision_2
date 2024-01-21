@@ -8,4 +8,4 @@ start-seeder:
 	npx prisma db seed
 
 start-test:
-	bash ./e2e/e2e.bash
+	cd e2e && npm run test
