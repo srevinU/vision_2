@@ -1,8 +1,8 @@
 describe('User endpoint', () => {
   const env = process.env;
   let jwt;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let userId;
-  let userEmail;
   it('Login admin test user', async () => {
     const user = {
       email: 'admin@gmail.fr',
@@ -22,32 +22,9 @@ describe('User endpoint', () => {
     jwt = response.headers.get('Set-Cookie');
   });
 
-  it('Register a new user', async () => {
-    const user = {
-      firstName: 'e2e_Test',
-      lastName: 'e2e_Test',
-      email: 'e2e_Test@gmail.com',
-      password: 'e2e_Test',
-    };
+  it('Get specific user', async () => {
     const response = await fetch(
-      `http://${env.AUTH_DOMAIN}:${env.AUTH_PORT}/api/auth/register`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify(user),
-      },
-    );
-    const data = await response.text();
-    userEmail = JSON.parse(data).email;
-    userId = JSON.parse(data).id;
-    expect(response.ok).toBeTruthy();
-  });
-
-  it('Get user registered', async () => {
-    const response = await fetch(
-      `http://${env.USER_DOMAIN}:${env.USER_PORT}/api/users/${userEmail}`,
+      `http://${env.USER_DOMAIN}:${env.USER_PORT}/api/users/e2e_Test@gmail.com`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -57,9 +34,11 @@ describe('User endpoint', () => {
       },
     );
     expect(response.ok).toBeTruthy();
+    const data = await response.text();
+    userId = JSON.parse(data).id;
   });
 
-  it('Delete user registered', async () => {
+  it('Delete user', async () => {
     const response = await fetch(
       `http://${env.USER_DOMAIN}:${env.USER_PORT}/api/users/${userId}`,
       {

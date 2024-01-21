@@ -1,22 +1,20 @@
 version: '3.1'
 
 services:
-  e2e:
-    container_name: e2e-tests
-    build:
-      dockerfile: ./e2e/Dockerfile
-    volumes:
-      - './e2e/specs:/usr/src/app/e2e/specs:rw'
-    depends_on:
-      - db
-      - redis
-      - users
-      - auth
-      - roles
-    networks:
-      - auth-net
-      - roles-net
-      - users-net
+  # e2e:
+  # container_name: e2e-tests
+  # build:
+  #   dockerfile: ./e2e/Dockerfile
+  # volumes:
+  #   - './e2e/specs:/usr/src/app/e2e/specs:rw'
+  # depends_on:
+  #   - db
+  #   - redis
+  #   - users
+  #   - auth
+  #   - roles
+  # networks:
+  #   - e2e_net
 
   db:
     container_name: database
@@ -28,8 +26,8 @@ services:
     ports:
       - 3306:3306
     networks:
-      - db-net
-      - adminer-net
+      - db_net
+      - adminer_net
 
   redis:
     container_name: redis
@@ -40,7 +38,7 @@ services:
     volumes:
       - redis:/data
     networks:
-      - redis-net
+      - redis_net
 
   adminer:
     container_name: adminer
@@ -49,7 +47,7 @@ services:
     ports:
       - 8080:8080
     networks:
-      - adminer-net
+      - adminer_net
     depends_on:
       - db
 
@@ -69,8 +67,8 @@ services:
       - './apps/users:/usr/src/app/apps/users:rw'
       - './libs/common:/usr/src/app/libs/common:rw'
     networks:
-      - users-net
-      - db-net
+      - e2e_net
+      - db_net
     depends_on:
       - db
 
@@ -90,9 +88,9 @@ services:
       - './apps/auth:/usr/src/app/apps/auth:rw'
       - './libs/common:/usr/src/app/libs/common:rw'
     networks:
-      - auth-net
-      - redis-net
-      - db-net
+      - e2e_net
+      - redis_net
+      - db_net
     depends_on:
       - db
       - redis
@@ -113,8 +111,8 @@ services:
       - ./apps/roles:/usr/src/app/apps/roles:rw
       - ./libs/common:/usr/src/app/libs/common:rw
     networks:
-      - roles-net
-      - db-net
+      - e2e_net
+      - db_net
     depends_on:
       - db
 
@@ -123,9 +121,7 @@ volumes:
     driver: local
 
 networks:
-  adminer-net:
-  auth-net:
-  roles-net:
-  users-net:
-  redis-net:
-  db-net:
+  adminer_net:
+  e2e_net:
+  redis_net:
+  db_net:

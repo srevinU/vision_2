@@ -8,4 +8,4 @@ start-seeder:
 	npx prisma db seed
 
 start-test:
-	docker-compose up e2e
+	bash ./e2e/e2e.bash
