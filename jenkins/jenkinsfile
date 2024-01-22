@@ -1,31 +1,33 @@
 pipeline {
     agent any
-    stages('init') {
-        steps {
-            script {
-                // def path = pwd()
-                def functions = load './script.groovy'
+    stages {
+        stage('init') {
+            steps {
+                script {
+                    // def path = pwd()
+                    def functions = load './script.groovy'
+                }
             }
         }
-    }
-    stage('Build') {
-        steps {
-            script {
-                functions.buildApp()
+        stage('Build') {
+            steps {
+                script {
+                    functions.buildApp()
+                }
             }
         }
-    }
-    stage('Test') {
-        steps {
-            script {
-                functions.testApp()
+        stage('Test') {
+            steps {
+                script {
+                    functions.testApp()
+                }
             }
         }
-    }
-    stage('Deploy') {
-        steps {
-            script {
-                functions.deployApp()
+        stage('Deploy') {
+            steps {
+                script {
+                    functions.deployApp()
+                }
             }
         }
     }
