@@ -42,12 +42,22 @@ services:
     networks:
       - redis_net
 
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - 8080:8080
+    networks:
+      - jenkins_net
+
   adminer:
     container_name: adminer
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 8282:8080
     networks:
       - adminer_net
     depends_on:
@@ -127,3 +137,4 @@ networks:
   e2e_net:
   redis_net:
   db_net:
+  jenkins_net:
