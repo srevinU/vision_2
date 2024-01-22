@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+    environment {
+        VARIABLE_TEST = 'TEST'
+    }
+    stages {
+        stage('Init') {
+            steps {
+                script {
+                    script = load script.groovy
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    script.buildApp()
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    script.testApp()
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    script.deployApp()
+                }
+            }
+        }
+    }
+}
+
+post {
+    always {
+    //
+    }
+    success {
+    //
+    }
+    failure {
+    //
+    }
+}
