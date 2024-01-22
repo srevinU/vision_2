@@ -7,28 +7,28 @@ pipeline {
         stage('Init') {
             steps {
                 script {
-                    script = load script.groovy
+                    fonctions = load ./script.groovy
                 }
             }
         }
         stage('Build') {
             steps {
                 script {
-                    script.buildApp()
+                    fonctions.buildApp()
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    script.testApp()
+                    fonctions.testApp()
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    script.deployApp()
+                    fonctions.deployApp()
                 }
             }
         }
