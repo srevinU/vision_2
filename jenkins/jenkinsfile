@@ -4,8 +4,8 @@ pipeline {
         stage('init') {
             steps {
                 script {
-                    def functions = load 'script.groovy'
-                    functions.buildApp()
+                    def runner = load pwd() + '/script.groovy'
+                    runner.buildApp()
                 }
             }
         }
