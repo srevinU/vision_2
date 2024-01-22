@@ -6,28 +6,20 @@ pipeline {
                 script {
                     // def path = pwd()
                     def functions = load './script.groovy'
+                    functions.buildApp()
                 }
             }
         }
         stage('Build') {
             steps {
-                script {
-                    functions.buildApp()
-                }
             }
         }
         stage('Test') {
             steps {
-                script {
-                    functions.testApp()
-                }
             }
         }
         stage('Deploy') {
             steps {
-                script {
-                    functions.deployApp()
-                }
             }
         }
     }
