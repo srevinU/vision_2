@@ -1,35 +1,31 @@
 pipeline {
     agent any
-    environment {
-        VARIABLE_TEST = 'TEST'
+    stages('init') {
+        steps {
+            script {
+                // def path = pwd()
+                def functions = load './script.groovy'
+            }
+        }
     }
-    stages {
-        stage('Init') {
-            steps {
-                script {
-                    fonctions = load ./script.groovy
-                }
+    stage('Build') {
+        steps {
+            script {
+                functions.buildApp()
             }
         }
-        stage('Build') {
-            steps {
-                script {
-                    fonctions.buildApp()
-                }
+    }
+    stage('Test') {
+        steps {
+            script {
+                functions.testApp()
             }
         }
-        stage('Test') {
-            steps {
-                script {
-                    fonctions.testApp()
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                script {
-                    fonctions.deployApp()
-                }
+    }
+    stage('Deploy') {
+        steps {
+            script {
+                functions.deployApp()
             }
         }
     }
