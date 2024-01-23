@@ -4,37 +4,41 @@ pipeline {
         stage('init') {
             steps {
                 script {
-                    gv = laod 'script.groovy'
-                    gv.buildApp()
+                   def script = load "${WORKSPACE}/jenkins/script.groovy"
                 }
             }
         }
         stage('Build') {
             steps {
-                echo 'build'
+                script {
+                    script.buildApp()
+                }
             }
         }
         stage('Test') {
             steps {
-                echo 'test'
+                script {
+                    script.testApp()   
+                }
             }
         }
         stage('Deploy') {
             steps {
-                echo 'deploy'
+                script {
+                    script.deployApp()
+                }
             }
         }
     }
-}
-
-post {
-    always {
-    //
-    }
-    success {
-    //
-    }
-    failure {
-    //
+    post {
+        always {
+            echo 'This will run always'
+        }
+        success {
+            echo 'This will run on success'
+        }
+        failure {
+            echo 'This will run on failure'
+        }
     }
 }
