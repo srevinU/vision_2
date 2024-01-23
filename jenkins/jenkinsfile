@@ -3,15 +3,13 @@ pipeline {
     stages {
         stage('init') {
             steps {
-                script {
-                   def script = load "${WORKSPACE}/jenkins/script.groovy"
-                }
+                echo 'init'
             }
         }
         stage('Build') {
             steps {
                 script {
-                    def script = load "${WORKSPACE}/jenkins/script.groovy"
+                    def script = load "${WORKSPACE}/jenkins/build.groovy"
                     script.buildApp()
                 }
             }
@@ -19,7 +17,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    def script = load "${WORKSPACE}/jenkins/script.groovy"
+                    def script = load "${WORKSPACE}/jenkins/test.groovy"
                     script.testApp()   
                 }
             }
@@ -27,7 +25,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def script = load "${WORKSPACE}/jenkins/script.groovy"
+                    def script = load "${WORKSPACE}/deploy/script.groovy"
                     script.deployApp()
                 }
             }
