@@ -10,14 +10,14 @@ export const roleSeeds = async (prisma: PrismaClient) => {
         userId: 'user_test_admin',
       },
       {
-        id: 'user_test_id_2',
+        id: 'role_test_id_2',
         name: 'user',
-        userId: 'user_test_id_1',
+        userId: 'role_test_id_1',
       },
       {
-        id: 'user_test_id_3',
+        id: 'role_test_id_3',
         name: 'user',
-        userId: 'user_test_id_2',
+        userId: 'role_test_id_2',
       },
     ],
   });

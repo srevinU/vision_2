@@ -1,6 +1,23 @@
 version: '3.1'
 
 services:
+  e2e:
+    container_name: e2e-tests
+    build:
+      dockerfile: ./e2e/Dockerfile
+    volumes:
+      - './e2e/specs:/usr/src/app/e2e/specs:rw'
+    env_file:
+      - ./e2e/.env.dev
+    depends_on:
+      - db
+      - redis
+      - users
+      - auth
+      - roles
+    networks:
+      - e2e_net
+
   db:
     container_name: database
     image: mysql
@@ -10,13 +27,43 @@ services:
       MYSQL_DATABASE: vision
     ports:
       - 3306:3306
+    networks:
+      - db_net
+      - adminer_net
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+    networks:
+      - redis_net
+
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    env_file:
+      - ./e2e/.env.dev
+    ports:
+      - 8080:8080
+    networks:
+      - jenkins_net
 
   adminer:
     container_name: adminer
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 8282:8080
+    networks:
+      - adminer_net
+    depends_on:
+      - db
 
   users:
     container_name: users-api
@@ -33,6 +80,10 @@ services:
     volumes:
       - './apps/users:/usr/src/app/apps/users:rw'
       - './libs/common:/usr/src/app/libs/common:rw'
+    networks:
+      - e2e_net
+      - db_net
+      - jenkins_net
     depends_on:
       - db
 
@@ -51,8 +102,14 @@ services:
     volumes:
       - './apps/auth:/usr/src/app/apps/auth:rw'
       - './libs/common:/usr/src/app/libs/common:rw'
+    networks:
+      - e2e_net
+      - redis_net
+      - db_net
+      - jenkins_net
     depends_on:
       - db
+      - redis
 
   roles:
     container_name: roles-api
@@ -69,5 +126,20 @@ services:
     volumes:
       - ./apps/roles:/usr/src/app/apps/roles:rw
       - ./libs/common:/usr/src/app/libs/common:rw
+    networks:
+      - e2e_net
+      - db_net
+      - jenkins_net
     depends_on:
       - db
+
+volumes:
+  redis:
+    driver: local
+
+networks:
+  adminer_net:
+  e2e_net:
+  redis_net:
+  db_net:
+  jenkins_net:

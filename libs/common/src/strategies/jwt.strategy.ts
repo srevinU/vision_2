@@ -10,7 +10,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly prismaService: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => request?.cookies['access_token'],
+        (request: any) => request?.cookies['Authentication'],
       ]),
       ignoreExpiration: false,
       secretOrKey: env.JWT_SECRET,
@@ -18,6 +18,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate({ sub }: Tuser) {
-    return this.prismaService.users.findUnique({ where: { id: sub } });
+    return await this.prismaService.users.findUnique({ where: { id: sub } });
   }
 }

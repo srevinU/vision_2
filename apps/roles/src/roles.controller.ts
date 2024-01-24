@@ -28,13 +28,13 @@ export class RolesController {
     return this.rolesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(id);
+  @Get(':userId')
+  findOne(@Param('userId') userId: string) {
+    return this.rolesService.findMany(userId);
   }
 
-  @Delete(':id')
-  removeAll(@Param('id') id: string) {
-    return this.rolesService.remove(id);
+  @Delete(':roleId')
+  removeAll(@Param('roleId') roleId: string) {
+    return this.rolesService.remove(roleId);
   }
 }

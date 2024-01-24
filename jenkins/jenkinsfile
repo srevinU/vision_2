@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    tools {nodejs 'node'}
+    stages {
+        stage('init') {
+            steps {
+                echo 'init'
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    def groovy = load "${WORKSPACE}/jenkins/build.groovy"
+                    groovy.buildApp()
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    def groovy = load "${WORKSPACE}/jenkins/test.groovy"
+                    groovy.testApp()   
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    def groovy = load "${WORKSPACE}/jenkins/deploy.groovy"
+                    groovy.deployApp()
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'This will run always'
+        }
+        success {
+            echo 'This will run on success'
+        }
+        failure {
+            echo 'This will run on failure'
+        }
+    }
+}

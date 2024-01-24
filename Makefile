@@ -6,3 +6,6 @@ start-migration:
 
 start-seeder:
 	npx prisma db seed
+
+start-test:
+	cd e2e && npm run test

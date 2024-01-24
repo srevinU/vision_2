@@ -1,15 +1,18 @@
 import {
   Res,
   Post,
+  Get,
   Body,
   Controller,
   HttpCode,
   HttpStatus,
+  Param,
+  Req,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { UserAuthDto } from './dto/user-auth.dto';
-import { CreateUserRegister } from './dto/create-user-register';
+import { CreateUserRegister } from './dto/create-user-register.dto';
 
 @Controller('api/auth')
 export class AuthController {
@@ -21,18 +24,30 @@ export class AuthController {
     @Body() userAuthDto: UserAuthDto,
     @Res() response: Response,
   ): Promise<Response | undefined | void> {
-    const { access_token } = await this.authService.login(userAuthDto);
-    response
-      .cookie('access_token', access_token, {
-        httpOnly: true,
-        expires: this.authService.getExpire(),
-      })
-      .send({ status: 'OK' });
+    await this.authService.login(userAuthDto, response);
+    response.send({ status: 'OK' });
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
   async register(@Body() user: CreateUserRegister): Promise<any> {
     return await this.authService.register(user);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('refresh')
+  async refreshToken(@Req() request: Request, @Res() response: Response) {
+    await this.authService.refreshTokens(request, response);
+    response.send({ status: 'OK' });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('logout/:userEmail')
+  async logOut(
+    @Param('userEmail') userEmail: string,
+    @Res() response: Response,
+  ): Promise<Response | undefined | void> {
+    this.authService.logOut(response, userEmail);
+    response.send({ status: 'OK' });
   }
 }

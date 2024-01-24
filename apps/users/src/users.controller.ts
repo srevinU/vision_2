@@ -9,13 +9,18 @@ import { Get, Param, Delete, Controller, UseGuards } from '@nestjs/common';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+
   @Get(':email')
   findOne(@Param('email') email: string): Promise<any> {
     return this.usersService.findOneByEmail(email);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string): Promise<any> {
-    return this.usersService.remove(id);
+  @Delete(':userId')
+  remove(@Param('userId') userId: string): Promise<any> {
+    return this.usersService.remove(userId);
   }
 }
