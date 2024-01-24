@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    tools {nodejs 'node'}
     stages {
         stage('init') {
             steps {
@@ -9,24 +10,24 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    def script = load "${WORKSPACE}/jenkins/build.groovy"
-                    script.buildApp()
+                    def groovy = load "${WORKSPACE}/jenkins/build.groovy"
+                    groovy.buildApp()
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    def script = load "${WORKSPACE}/jenkins/test.groovy"
-                    script.testApp()   
+                    def groovy = load "${WORKSPACE}/jenkins/test.groovy"
+                    groovy.testApp()   
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    def script = load "${WORKSPACE}/jenkins/deploy.groovy"
-                    script.deployApp()
+                    def groovy = load "${WORKSPACE}/jenkins/deploy.groovy"
+                    groovy.deployApp()
                 }
             }
         }
