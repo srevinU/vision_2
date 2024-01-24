@@ -9,6 +9,3 @@ start-seeder:
 
 start-test:
 	cd e2e && npm run test
-
-say-hello:
-	echo 'Hello !'
