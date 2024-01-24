@@ -47,6 +47,8 @@ services:
     image: jenkins/jenkins:lts
     privileged: true
     user: root
+    env_file:
+      - ./e2e/.env.dev
     ports:
       - 8080:8080
     networks:
