@@ -2,13 +2,13 @@ version: '3.1'
 
 services:
   e2e:
-    container_name: e2e-tests
+    container_name: e2e-tests-${STAGE_NAME}
     build:
       dockerfile: ./e2e/Dockerfile
     volumes:
       - './e2e/specs:/usr/src/app/e2e/specs:rw'
     env_file:
-      - ./e2e/.env.dev
+      - ./e2e/env/.env.${STAGE_NAME}
     depends_on:
       - db
       - redis
@@ -19,7 +19,7 @@ services:
       - e2e_net
 
   db:
-    container_name: database
+    container_name: database-${STAGE_NAME}
     image: mysql
     restart: always
     environment:
@@ -32,7 +32,7 @@ services:
       - adminer_net
 
   redis:
-    container_name: redis
+    container_name: redis-${STAGE_NAME}
     image: redis
     restart: always
     ports:
@@ -43,19 +43,19 @@ services:
       - redis_net
 
   jenkins:
-    container_name: jenkins
+    container_name: jenkins-${STAGE_NAME}
     image: jenkins/jenkins:lts
     privileged: true
     user: root
     env_file:
-      - ./e2e/.env.dev
+      - ./e2e/env/.env.${STAGE_NAME}
     ports:
       - 8080:8080
     networks:
       - jenkins_net
 
   adminer:
-    container_name: adminer
+    container_name: adminer-${STAGE_NAME}
     image: adminer
     restart: always
     ports:
@@ -66,7 +66,7 @@ services:
       - db
 
   users:
-    container_name: users-api
+    container_name: users-api-${STAGE_NAME}
     restart: always
     build:
       context: .
@@ -74,7 +74,7 @@ services:
       target: development
     command: npm run start:dev users
     env_file:
-      - ./apps/users/.env
+      - ./apps/users/env/.env.${STAGE_NAME}
     ports:
       - 3000:3000
     volumes:
@@ -88,7 +88,7 @@ services:
       - db
 
   auth:
-    container_name: auth-api
+    container_name: auth-api-${STAGE_NAME}
     restart: always
     build:
       context: .
@@ -96,7 +96,7 @@ services:
       target: development
     command: npm run start:dev auth
     env_file:
-      - ./apps/auth/.env
+      - ./apps/auth/env/.env.${STAGE_NAME}
     ports:
       - 3001:3001
     volumes:
@@ -112,7 +112,7 @@ services:
       - redis
 
   roles:
-    container_name: roles-api
+    container_name: roles-api-${STAGE_NAME}
     restart: always
     build:
       context: .
@@ -120,7 +120,7 @@ services:
       target: development
     command: npm run start:dev roles
     env_file:
-      - ./apps/roles/.env
+      - ./apps/roles/env/.env.${STAGE_NAME}
     ports:
       - 3002:3002
     volumes:
@@ -139,7 +139,12 @@ volumes:
 
 networks:
   adminer_net:
+    name: adminer_net_${STAGE_NAME}
   e2e_net:
+    name: e2e_net_${STAGE_NAME}
   redis_net:
+    name: redis_net_${STAGE_NAME}
   db_net:
+    name: db_net_${STAGE_NAME}
   jenkins_net:
+    name: jenkins_net_${STAGE_NAME}
