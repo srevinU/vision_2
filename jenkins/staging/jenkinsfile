@@ -2,6 +2,14 @@ pipeline {
     agent any
     tools {nodejs 'node'}
     stages {
+        stage('init') {
+            steps {
+                script {
+                    def groovy = load "${WORKSPACE}/jenkins/staging/init.staging.groovy"
+                    groovy.init()
+                }
+            }
+        }
         stage('Build') {
             steps {
                 script {
