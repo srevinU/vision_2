@@ -1,22 +1,16 @@
 pipeline {
     agent any
-    environment {
-        STAGE = "${env.BRANCH_NAME == 'staging' ? 'staging' : 'production'}"
-    }
     tools {nodejs 'node'}
     stages {
         stage('init') {
             steps {
                 echo 'init'
-                sh "echo ${env.BRANCH_NAME}"
-                sh "echo ${env.STAGE}"
-                sh "echo ${STAGE}"
             }
         }
         stage('Build') {
             steps {
                 script {
-                    def groovy = load "${WORKSPACE}/jenkins/build.groovy"
+                    def groovy = load "${WORKSPACE}/jenkins/staging/build.staging.groovy"
                     groovy.buildApp()
                 }
             }
@@ -24,7 +18,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    def groovy = load "${WORKSPACE}/jenkins/test.groovy"
+                    def groovy = load "${WORKSPACE}/jenkins/staging/test.staging.groovy"
                     groovy.testApp()   
                 }
             }
@@ -32,7 +26,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def groovy = load "${WORKSPACE}/jenkins/deploy.groovy"
+                    def groovy = load "${WORKSPACE}/jenkins/staging/deploy.staging.groovy"
                     groovy.deployApp()
                 }
             }
