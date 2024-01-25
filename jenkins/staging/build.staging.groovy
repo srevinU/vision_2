@@ -4,7 +4,7 @@ def buildApp() {
     sh "apt upgrade -y"
     sh "apt install make" 
     sh "npm i"
-    sh "STAGE_NAME=staging docker-compose -p "vision-staging"  up"
+    sh "STAGE_NAME=staging docker-compose -p 'vision-staging'  up"
     sh "make start-migration"
     sh "make start-sedder"
 }
