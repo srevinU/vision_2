@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         STAGE_TEST = "${env.BRANCH_NAME == 'staging' ? 'staging' : 'production'}"
-        sh "echo ${STAGE_TEST}"
+        sh "echo ${env.STAGE_TEST}"
     }
     tools {nodejs 'node'}
     stages {
