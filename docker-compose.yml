@@ -30,6 +30,7 @@ services:
     networks:
       - db_net
       - adminer_net
+      - jenkins_net
 
   redis:
     container_name: redis-${STAGE_NAME}
@@ -41,6 +42,7 @@ services:
       - redis:/data
     networks:
       - redis_net
+      - jenkins_net
 
   jenkins:
     container_name: jenkins-${STAGE_NAME}
@@ -86,6 +88,7 @@ services:
       - jenkins_net
     depends_on:
       - db
+      - jenkins_net
 
   auth:
     container_name: auth-api-${STAGE_NAME}
@@ -110,6 +113,7 @@ services:
     depends_on:
       - db
       - redis
+      - jenkins_net
 
   roles:
     container_name: roles-api-${STAGE_NAME}

@@ -2,11 +2,6 @@ pipeline {
     agent any
     tools {nodejs 'node'}
     stages {
-        stage('init') {
-            steps {
-                echo 'init'
-            }
-        }
         stage('Build') {
             steps {
                 script {
