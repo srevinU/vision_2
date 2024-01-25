@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        STAGE_NAME = "${env.BRANCH_NAME == 'staging ? 'staging : 'production'}"
+        sh 'echo ${STAGE_NAME}'
+    }
     tools {nodejs 'node'}
     stages {
         stage('init') {
