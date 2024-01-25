@@ -1,5 +1,5 @@
 start:
-    # local | staging | production
+    # local | staging | production / make start ENV=bar
 	STAGE_NAME=$(ENV) docker-compose -p "vision-$(ENV)"  up
 
 start-migration:

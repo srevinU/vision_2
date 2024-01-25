@@ -88,7 +88,6 @@ services:
       - jenkins_net
     depends_on:
       - db
-      - jenkins_net
 
   auth:
     container_name: auth-api-${STAGE_NAME}
@@ -113,7 +112,6 @@ services:
     depends_on:
       - db
       - redis
-      - jenkins_net
 
   roles:
     container_name: roles-api-${STAGE_NAME}
