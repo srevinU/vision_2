@@ -1,15 +1,16 @@
 pipeline {
     agent any
     environment {
-        STAGE = "${BRANCH_NAME == 'staging' ? 'staging' : 'production'}"
+        TT = "${env.BRANCH_NAME == 'staging' ? 'staging' : 'production'}"
     }
     tools {nodejs 'node'}
     stages {
         stage('init') {
             steps {
                 echo 'init'
-                sh "echo ${BRANCH_NAME}"
-                sh "echo ${env.STAGE}"
+                sh "echo ${env.BRANCH_NAME}"
+                sh "echo ${env.TT}"
+                sh "echo ${TT}"
             }
         }
         stage('Build') {
