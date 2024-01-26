@@ -1,6 +1,6 @@
-.env filter=git-crypt diff=git-crypt
-e2e/.env filter=git-crypt diff=git-crypt
-e2e/env/** filter=git-crypt diff=git-crypt
-apps/auth/env/** filter=git-crypt diff=git-crypt
-apps/roles/env/** filter=git-crypt diff=git-crypt
-apps/users/env/** filter=git-crypt diff=git-crypt
+# .env filter=git-crypt diff=git-crypt
+# e2e/.env filter=git-crypt diff=git-crypt
+# e2e/env/** filter=git-crypt diff=git-crypt
+# apps/auth/env/** filter=git-crypt diff=git-crypt
+# apps/roles/env/** filter=git-crypt diff=git-crypt
+# apps/users/env/** filter=git-crypt diff=git-crypt
