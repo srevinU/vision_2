@@ -54,6 +54,14 @@ services:
       - 8080:8080
     networks:
       - jenkins_net
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '2G'
+        reservations:
+          cpus: '0.5'
+          memory: '1G'
 
   adminer:
     container_name: adminer-${STAGE_NAME}
