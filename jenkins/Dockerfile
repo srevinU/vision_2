@@ -1,20 +1,24 @@
 FROM jenkins/jenkins:lts
 USER root
-RUN apt update
-RUN apt upgrade -y
-RUN apt install make
-RUN apt-get update
-RUN apt-get install ca-certificates curl gnupg
-RUN install -m 0755 -d /etc/apt/keyrings
 
-RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz \
-  && tar xzvf docker-17.04.0-ce.tgz \
-  && mv docker/docker /usr/local/bin \
-  && rm -r docker docker-17.04.0-ce.tgz
+RUN apt-get update && \
+    apt-get install -y ca-certificates curl sudo && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
+    chmod a+r /etc/apt/keyrings/docker.asc && \
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+    apt-get update && \
+    apt-get install -y docker-ce && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN curl -L https://github.com/docker/compose/releases/download/v2.24.3/docker-compose-Linux-aarch64 -o /usr/local/bin/docker-compose
-RUN chmod +x /usr/local/bin/docker-compose
-RUN apt update
-# RUN touch ../git-crypt-key
+RUN curl -L https://github.com/docker/compose/releases/download/v2.24.3/docker-compose-Linux-aarch64 -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
 
-# docker build --no-cache -t jenkins-docker-test .
+RUN usermod -a -G docker jenkins && \
+    echo 'jenkins:jenkins' | chpasswd && \
+    echo 'jenkins ALL=NOPASSWD: ALL' >> /etc/sudoers
+
+USER jenkins
