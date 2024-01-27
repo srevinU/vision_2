@@ -52,17 +52,9 @@ services:
     env_file:
       - ./e2e/env/.env.${STAGE_NAME}
     ports:
-      - 8080:8080
+      - 8181:8080
     networks:
       - jenkins_net
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: '4G'
-        reservations:
-          cpus: '1'
-          memory: '2G'
 
   adminer:
     container_name: adminer-${STAGE_NAME}
