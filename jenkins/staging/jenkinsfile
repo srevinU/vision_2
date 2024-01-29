@@ -2,6 +2,14 @@ pipeline {
     agent any
     tools {nodejs 'node'}
     stages {
+        stage('Cleaning') {
+            steps {
+                script {
+                    def groovy = load "${WORKSPACE}/jenkins/staging/cleaning.staging.groovy"
+                    groovy.cleanApp()
+                }
+            }
+        }
         stage('Build') {
             steps {
                 script {
@@ -14,7 +22,7 @@ pipeline {
             steps {
                 script {
                     def groovy = load "${WORKSPACE}/jenkins/staging/test.staging.groovy"
-                    groovy.testApp()   
+                    groovy.testApp()
                 }
             }
         }
@@ -23,14 +31,6 @@ pipeline {
                 script {
                     def groovy = load "${WORKSPACE}/jenkins/staging/deploy.staging.groovy"
                     groovy.deployApp()
-                }
-            }
-        }
-        stage('Cleaning') {
-            steps {
-                script {
-                    def groovy = load "${WORKSPACE}/jenkins/staging/cleaning.staging.groovy"
-                    groovy.cleanApp()
                 }
             }
         }
