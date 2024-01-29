@@ -3,6 +3,8 @@ USER root
 
 RUN apt update
 RUN apt install git-crypt
+RUN apt install npm -y
+RUN npm i -g npx
 RUN apt install make
 RUN apt install -y ca-certificates curl sudo
 RUN install -m 0755 -d /etc/apt/keyrings

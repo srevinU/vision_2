@@ -1,6 +1,6 @@
 services:
   e2e:
-    container_name: e2e-tests-${STAGE_NAME}
+    container_name: e2e-tests
     build:
       context: .
       dockerfile: ./e2e/Dockerfile
@@ -18,7 +18,7 @@ services:
       - e2e_net
 
   db:
-    container_name: database-${STAGE_NAME}
+    container_name: database
     image: mysql
     restart: always
     environment:
@@ -32,7 +32,7 @@ services:
       - jenkins_net
 
   redis:
-    container_name: redis-${STAGE_NAME}
+    container_name: redis
     image: redis
     restart: always
     ports:
@@ -44,7 +44,7 @@ services:
       - jenkins_net
 
   jenkins:
-    container_name: jenkins-${STAGE_NAME}
+    container_name: jenkins
     build:
       context: .
       dockerfile: ./jenkins/Dockerfile
@@ -57,7 +57,7 @@ services:
       - jenkins_net
 
   adminer:
-    container_name: adminer-${STAGE_NAME}
+    container_name: adminer
     image: adminer
     restart: always
     ports:
@@ -68,7 +68,7 @@ services:
       - db
 
   users:
-    container_name: users-api-${STAGE_NAME}
+    container_name: users-api
     restart: always
     build:
       context: .
@@ -90,7 +90,7 @@ services:
       - db
 
   auth:
-    container_name: auth-api-${STAGE_NAME}
+    container_name: auth-api
     restart: always
     build:
       context: .
@@ -114,7 +114,7 @@ services:
       - redis
 
   roles:
-    container_name: roles-api-${STAGE_NAME}
+    container_name: roles-api
     restart: always
     build:
       context: .
@@ -138,15 +138,17 @@ services:
 volumes:
   redis:
     driver: local
+  database:
+    driver: local
 
 networks:
   adminer_net:
-    name: adminer_net_${STAGE_NAME}
+    name: adminer_net
   e2e_net:
-    name: e2e_net_${STAGE_NAME}
+    name: e2e_net
   redis_net:
-    name: redis_net_${STAGE_NAME}
+    name: redis_net
   db_net:
-    name: db_net_${STAGE_NAME}
+    name: db_net
   jenkins_net:
-    name: jenkins_net_${STAGE_NAME}
+    name: jenkins_net
