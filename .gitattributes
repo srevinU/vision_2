@@ -1,4 +1,4 @@
-.env filter=git-crypt diff=git-crypt
+./.env filter=git-crypt diff=git-crypt
 e2e/.env filter=git-crypt diff=git-crypt
 e2e/env/** filter=git-crypt diff=git-crypt
 apps/auth/env/** filter=git-crypt diff=git-crypt
