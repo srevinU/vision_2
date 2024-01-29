@@ -26,6 +26,14 @@ pipeline {
                 }
             }
         }
+        stage('Cleaning') {
+            steps {
+                script {
+                    def groovy = load "${WORKSPACE}/jenkins/staging/cleaning.staging.groovy"
+                    groovy.cleanApp()
+                }
+            }
+        }
     }
     post {
         always {
