@@ -1,0 +1,58 @@
+steps:
+# Authentification
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/auth/staging', 
+      '-f',
+      'apps/auth/Dockerfile',
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/auth/staging',
+    ]
+# Users
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/users/staging', 
+      '-f',
+      'apps/users/Dockerfile',
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/users/staging',
+    ]
+# Roles
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/roles/staging', 
+      '-f',
+      'apps/roles/Dockerfile',
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/roles/staging',
+    ]
+# E2e
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/e2e/staging', 
+      '-f',
+      './e2e/Dockerfile',
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/e2e/staging',
+    ]
+  
