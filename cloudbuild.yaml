@@ -7,6 +7,7 @@ steps:
       'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/auth/staging', 
       '-f',
       'apps/auth/Dockerfile',
+      '.'
     ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [
@@ -21,6 +22,7 @@ steps:
       'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/users/staging', 
       '-f',
       'apps/users/Dockerfile',
+      '.'
     ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [
@@ -35,6 +37,7 @@ steps:
       'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/roles/staging', 
       '-f',
       'apps/roles/Dockerfile',
+      '.'
     ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [
@@ -49,6 +52,7 @@ steps:
       'docker build -t europe-southwest1-docker.pkg.dev/firm-vertex-412814/e2e/staging', 
       '-f',
       './e2e/Dockerfile',
+      '.'
     ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [
