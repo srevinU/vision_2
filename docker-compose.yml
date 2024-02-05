@@ -1,22 +1,4 @@
 services:
-  e2e:
-    container_name: e2e-tests
-    build:
-      context: .
-      dockerfile: ./e2e/Dockerfile
-    volumes:
-      - './e2e/specs:/usr/src/app/e2e/specs:rw'
-    env_file:
-      - ./e2e/env/.env.${STAGE_NAME}
-    depends_on:
-      - db
-      - redis
-      - users
-      - auth
-      - roles
-    networks:
-      - e2e_net
-
   db:
     container_name: database
     image: mysql
@@ -63,14 +45,13 @@ services:
       target: development
     command: npm run start:dev users
     env_file:
-      - ./apps/users/env/.env.${STAGE_NAME}
+      - ./apps/users/.env
     ports:
       - 3000:3000
     volumes:
       - './apps/users:/usr/src/app/apps/users:rw'
       - './libs/common:/usr/src/app/libs/common:rw'
     networks:
-      - e2e_net
       - db_net
       - jenkins_net
     depends_on:
@@ -85,14 +66,13 @@ services:
       target: development
     command: npm run start:dev auth
     env_file:
-      - ./apps/auth/env/.env.${STAGE_NAME}
+      - ./apps/auth/.env
     ports:
       - 3001:3001
     volumes:
       - './apps/auth:/usr/src/app/apps/auth:rw'
       - './libs/common:/usr/src/app/libs/common:rw'
     networks:
-      - e2e_net
       - redis_net
       - db_net
       - jenkins_net
@@ -109,14 +89,13 @@ services:
       target: development
     command: npm run start:dev roles
     env_file:
-      - ./apps/roles/env/.env.${STAGE_NAME}
+      - ./apps/roles/.env
     ports:
       - 3002:3002
     volumes:
       - ./apps/roles:/usr/src/app/apps/roles:rw
       - ./libs/common:/usr/src/app/libs/common:rw
     networks:
-      - e2e_net
       - db_net
       - jenkins_net
     depends_on:
@@ -131,8 +110,6 @@ volumes:
 networks:
   adminer_net:
     name: adminer_net
-  e2e_net:
-    name: e2e_net
   redis_net:
     name: redis_net
   db_net:

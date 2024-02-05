@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: roles
+  name: roles
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: roles
+  template:
+    metadata:
+      labels:
+        app: roles
+    spec:
+      containers:
+        - image: europe-southwest1-docker.pkg.dev/firm-vertex-412814/roles/staging
+          name: roles
