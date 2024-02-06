@@ -13,21 +13,19 @@ RUN npm install
 RUN npm run build auth
 RUN cd libs/common/src/prisma && npx prisma generate
 
-FROM node:alpine AS production
+FROM node:alpine AS staging
 
-ARG NODE_ENV=production
+ARG NODE_ENV=staging
 ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-
-RUN npm install
-
 COPY --from=development /usr/src/app/dist ./dist
 
-EXPOSE 3001
-
+RUN npm install
 RUN cd dist/libs/common/src/prisma && npx prisma generate
+
+EXPOSE 3001
 
 CMD ["node", "dist/apps/auth/src/main"]

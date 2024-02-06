@@ -1,6 +1,5 @@
 start:
-    # local | staging | production / make start ENV=bar
-	STAGE_NAME=$(ENV) docker-compose -p "vision-$(ENV)"  up -d
+	docker-compose -p "vision" up -d --build --force-recreate
 
 start-migration:
 	cd ./libs/common/src/prisma && npx prisma migrate dev
