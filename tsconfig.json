@@ -25,5 +25,6 @@
         "libs/common/src/*"
       ]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist", "**/*spec.ts", "./prisma/*.ts"],
 }
