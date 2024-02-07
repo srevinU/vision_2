@@ -17,3 +17,11 @@ spec:
       containers:
         - image: europe-southwest1-docker.pkg.dev/firm-vertex-412814/users/staging
           name: users
+          env:
+            - name: APP_NAME
+              value: User
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: DATABASE_URL
