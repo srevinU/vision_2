@@ -48,5 +48,10 @@ spec:
                 secretKeyRef:
                   name: redis
                   key: redisPort
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redisPassword
           ports:
             - containerPort: 3001
