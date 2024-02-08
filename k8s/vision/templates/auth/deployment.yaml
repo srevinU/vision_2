@@ -32,21 +32,21 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mysql
-                  key: DATABASE_URL
+                  key: databaseUrl
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: jwt
-                  key: JWT_SECRET
+                  key: jwtSecret
             - name: REDIS_HOST
               valueFrom:
                 secretKeyRef:
                   name: redis
-                  key: REDIS_HOST
+                  key: redisHost
             - name: REDIS_PORT
               valueFrom:
                 secretKeyRef:
                   name: redis
-                  key: REDIS_PORT
+                  key: redisPort
           ports:
             - containerPort: 3001
