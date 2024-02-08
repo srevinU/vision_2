@@ -28,30 +28,25 @@ spec:
               value: '10'
             - name: TTL
               value: '2000'
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: mysql
-                  key: DATABASE_URL
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: jwt
-                  key: JWT_SECRET
-            - name: REFRESH_JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: jwt
-                  key: REFRESH_JWT_SECRET
-            - name: REDIS_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: redis
-                  key: REDIS_HOST
-            - name: REDIS_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: redis
-                  key: REDIS_PORT
+            # - name: DATABASE_URL
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: mysql
+            #       key: DATABASE_URL
+            # - name: JWT_SECRET
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: jwt
+            #       key: JWT_SECRET
+            # - name: REDIS_HOST
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: redis
+            #       key: REDIS_HOST
+            # - name: REDIS_PORT
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: redis
+            #       key: REDIS_PORT
           ports:
             - containerPort: 3001

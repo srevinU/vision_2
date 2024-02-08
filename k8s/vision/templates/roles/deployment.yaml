@@ -20,10 +20,10 @@ spec:
           env:
             - name: APP_NAME
               value: Role
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: mysql
-                  key: DATABASE_URL
+            # - name: DATABASE_URL
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: mysql
+            #       key: DATABASE_URL
           ports:
             - containerPort: 3002
